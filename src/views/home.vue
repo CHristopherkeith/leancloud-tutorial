@@ -4,7 +4,11 @@
     <input v-model="title" placeholder="title">
     <input v-model="content" placeholder="content">
     <button @click="setTodo">Set Todo</button>
-    <span></span><div>ID: {{todoId}}</div>
+    <div>ID: {{todoId}}</div>
+    <input v-model="name" placeholder="name">
+    <input v-model="priority" placeholder="priority">
+    <button @click="setTodoFolder">Set TodoFolder</button>
+
   </div>
 </template>
 
@@ -19,6 +23,9 @@ AV.init(config)
 var Todo = AV.Object.extend('Todo')
 // 新建一个 Todo 对象
 var todo = new Todo()
+var TodoFolder = AV.Object.extend('TodoFolder')
+// 新建对象
+var todoFolder = new TodoFolder()
 export default {
   name: 'home',
   data () {
@@ -26,6 +33,8 @@ export default {
       msg: 'Leancloud Tutorial',
       title: '',
       content: '',
+      name: '',
+      priority: '',
       todoId: 'this is a id'
     }
   },
@@ -38,6 +47,25 @@ export default {
         this.todoId = todo.id
       }.bind(this), function (error) {
         console.error('Failed to create new object, with error message: ' + error.message)
+      })
+    },
+    setTodoFolder () {
+      // // 设置名称
+      // todoFolder.set('name', this.name)
+      // // 设置优先级
+      // todoFolder.set('priority', this.priority)
+      // todoFolder.save().then(function (todo) {
+      //   console.log('objectId is ' + todo.id)
+      // }, function (error) {
+      //   console.error(error)
+      // })
+       AV.Query.doCloudQuery('insert into TodoFolder(name, priority) values("工作", "1")').then(function (data) {
+        // data 中的 results 是本次查询返回的结果，AV.Object 实例列表
+        var results = data.results;
+        console.log(data)
+      }, function (error) {
+        //查询失败，查看 error
+        console.error(error);
       })
     }
   },
