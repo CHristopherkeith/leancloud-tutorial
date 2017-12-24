@@ -17,6 +17,26 @@
     <div>
       <input type="file" id="photoFileUpload"/><button @click="uploadLocalFile">upload local file</button>
     </div>
+    <div>
+      <button @click="BuildFileFromUrl">BuildFileFromUrl</button>
+    </div>
+    <div>
+      <input type="text" v-model="phoneNumber" placeholder="手机号码" />
+      <button @click="requestSmsCode">发送验证码</button @click="smsCodeSignUp">
+      <input type="text" v-model="smsCode" placeholder="验证码" />
+      <button @click="smsCodeSignUp">注册</button>
+    </div>
+    <div>
+      <input type="text" v-model="userName" placeholder="用户名" />
+      <input type="password" v-model="psw" placeholder="密码" />
+      <input type="text" v-model="email" placeholder="邮箱" />
+      <button @click="signUp">注册</button>
+    </div>
+    <div>
+      <input type="text" v-model="loginedName" placeholder="用户名" />
+      <input type="password" v-model="loginedPsw" placeholder="密码" />
+      <button @click="login">登录</button>
+    </div>
     
     <!-- <div>ID: {{todoId}}</div> -->
     
@@ -47,7 +67,14 @@ export default {
       content: '',
       name: '',
       priority: '',
-      todoId: 'this is a id'
+      todoId: 'this is a id',
+      phoneNumber: '',
+      smsCode: '',
+      userName: '',
+      psw: '',
+      email: '',
+      loginedName: '',
+      loginedPsw: ''
     }
   },
   methods: {
@@ -98,19 +125,78 @@ export default {
       var fileUploadControl = document.getElementById('photoFileUpload')
       if (fileUploadControl.files.length > 0) {
         var localFile = fileUploadControl.files[0]
+        console.log(localFile, 'localFile')
         var name = '傻狗狗.jpg'
         var file = new AV.File(name, localFile)
-        file.save().then(function (file) {
+        console.log(file.metaData(), 'file.metaData')
+        file.save({
+          onprogress: function (e) {
+            console.log(e)
+            // { loaded: 1234, total: 2468, percent: 50 }
+          }
+        }).then(function (file) {
           // 文件保存成功
-          console.log(file)
-          console.log(file.url())
+          // console.log(file)
+          // console.log(file.url())
         }, function (error) {
           // 异常处理
           console.error(error)
         })
       }
+    },
+    // 从网络构建文件
+    BuildFileFromUrl () {
+      var file = AV.File.withURL('Satomi_Ishihara.gif', 'http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif')
+      file.save().then(function (file) {
+        // 文件保存成功
+        console.log(file.url())
+      }, function (error) {
+        // 异常处理
+        console.error(error)
+      })
+    },
+    // 发送验证码
+    requestSmsCode () {
+      AV.Cloud.requestSmsCode(this.phoneNumber).then(function (success) {
+        console.log(success, 'success')
+      }, function (error) {
+        console.log(error, 'error')
+      })
+    },
+    // 验证码注册
+    smsCodeSignUp () {
+      AV.User.signUpOrlogInWithMobilePhone(this.phoneNumber, this.smsCode).then(function (success) {
+        // 成功
+        console.log(success, 'success')
+      }, function (error) {
+        // 失败
+        console.log(error, 'error')
+      })
+    },
+    // 普通注册
+    signUp () {
+      // 新建 AVUser 对象实例
+      var user = new AV.User()
+      // 设置用户名
+      user.setUsername(this.userName)
+      // 设置密码
+      user.setPassword(this.psw)
+      // 设置邮箱
+      user.setEmail(this.email)
+      user.signUp().then(function (loginedUser) {
+        console.log(loginedUser, 'loginedUser')
+      }, function (error) {
+        console.log(error, 'error')
+      })
+    },
+    // 普通登录
+    login () {
+      AV.User.logIn(this.loginedName, this.loginedPsw).then(function (loginedUser) {
+        console.log(loginedUser, 'loginedUser')
+      }, function (error) {
+        console.log(error, 'error')
+      })
     }
-
   },
   created () {
     // console.log('3333')

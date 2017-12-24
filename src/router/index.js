@@ -4,7 +4,7 @@ import home from '../views/home'
 
 Vue.use(Router)
 
-localStorage.setItem('debug', 'leancloud*')
+// localStorage.setItem('debug', 'leancloud*')
 
 export default new Router({
   routes: [
